@@ -15,6 +15,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
 
+import JOGL.NeheJOGL08Blending;
+
 public class JDBC_Choice extends JFrame{
 	
 	/**
@@ -54,9 +56,14 @@ public class JDBC_Choice extends JFrame{
 		getContentPane().add(current_db, BorderLayout.NORTH);
 		JPanel table = new DBTable();
 		getContentPane().add(table, BorderLayout.SOUTH);
-		setSize(500, 500);
+		
+		NeheJOGL08Blending joglMain = new NeheJOGL08Blending();
+		joglMain.setPreferredSize(new Dimension(500, 500));
+		getContentPane().add(joglMain, BorderLayout.EAST);
+		setSize(1000, 500);
 		setVisible(true);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		joglMain.animator.start();
 	}
 	
 	public void init_list(ArrayList<DBId> db_names)

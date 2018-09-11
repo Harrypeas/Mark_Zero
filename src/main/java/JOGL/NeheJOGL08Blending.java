@@ -4,12 +4,16 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
+
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL2ES1;
 import com.jogamp.opengl.GL2ES3;
 import com.jogamp.opengl.GLAutoDrawable;
+import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLException;
+import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.fixedfunc.GLLightingFunc;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
@@ -35,9 +39,9 @@ public class NeheJOGL08Blending extends JPanel implements GLEventListener, KeyLi
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-private static final int REFRESH_FPS = 60;    // Display refresh frames per second
+	private static final int REFRESH_FPS = 60;    // Display refresh frames per second
    private GLU glu;             // For the GL Utility
-   final com.jogamp.opengl.util.FPSAnimator animator;  // Used to drive display() 
+   public final com.jogamp.opengl.util.FPSAnimator animator;  // Used to drive display() 
    GLCanvas canvas;
    
    private static float angleX = 0.0f; // rotational angle for x-axis in degree
@@ -78,13 +82,56 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
 
    // Constructor
    public NeheJOGL08Blending() {
-      canvas = new GLCanvas();
+      GLCapabilities capabilities =new GLCapabilities(GLProfile.getDefault());
+      capabilities.setBackgroundOpaque(false);
+      capabilities.setAlphaBits(8);
+	  capabilities.setDoubleBuffered(true);
+	  capabilities.setHardwareAccelerated(true);
+	  setBorder(new LineBorder(Color.BLACK));
+      canvas = new GLCanvas(capabilities);
       this.setLayout(new BorderLayout());
       this.add(canvas, BorderLayout.CENTER);
+      canvas.setBackground(new Color(50, 150, 100, 150));
+      
+      setBackground(new Color(50, 150, 100, 150));
+      setTransferHandler(new CanvasDataHandler());
       canvas.addGLEventListener(this);
       canvas.addKeyListener(this);
       canvas.setFocusable(true);  // To receive key event
       canvas.requestFocus();
+      
+      canvas.addMouseListener(new MouseListener() {
+		
+		@Override
+		public void mouseReleased(java.awt.event.MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mousePressed(java.awt.event.MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mouseExited(java.awt.event.MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mouseEntered(java.awt.event.MouseEvent e) {
+			// TODO Auto-generated method stub
+			
+		}
+		
+		@Override
+		public void mouseClicked(java.awt.event.MouseEvent e) {
+			// TODO Auto-generated method stub
+			repaint();
+		}
+	});
    
       // Run the animation loop using the fixed-rate Frame-per-second animator,
       // which calls back display() at this fixed-rate (FPS).
@@ -93,8 +140,8 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
 
    // Main program
    public static void main(String[] args) {
-      final int WINDOW_WIDTH = 440;
-      final int WINDOW_HEIGHT = 440;
+      final int WINDOW_WIDTH = 600;
+      final int WINDOW_HEIGHT = 600;
       final String WINDOW_TITLE = "Nehe #8: Blending";
 
       JFrame frame = new JFrame();
@@ -117,7 +164,7 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
       frame.setSize(WINDOW_WIDTH, WINDOW_HEIGHT);
       frame.setTitle(WINDOW_TITLE);
       frame.setVisible(true);
-      joglMain.animator.start(); // start the animation loop
+//      joglMain.animator.start(); // start the animation loop
    }
 
    // ------ Implement methods declared in GLEventListener ------
@@ -128,11 +175,12 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
     */
    @Override
    public void init(GLAutoDrawable drawable) {
+	   System.out.println("init");
       GL2 gl = drawable.getGL().getGL2(); // Get the OpenGL graphics context
       glu = new GLU(); // GL Utilities
-      gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  // Set background (clear) color
+      gl.glClearColor(0.25f, 0.25f, 0.25f, 0.5f);  // Set background (clear) color
       gl.glClearDepth(1.0f); // Set clear depth value to farthest
-      //gl.glEnable(GL_DEPTH_TEST); // Enables depth testing
+//      gl.glEnable(GL2.GL_DEPTH_TEST); // Enables depth testing
       gl.glDepthFunc(GL2.GL_LEQUAL); // The type of depth test to do
       // Do the best perspective correction
       gl.glHint(GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT, GL2.GL_NICEST);
@@ -181,7 +229,6 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
          textureLeft2 = textureCoords2.left();
          textureRight2 = textureCoords2.right();
          
-
       } catch (GLException e) {
          e.printStackTrace();
       } catch (IOException e) {
@@ -239,7 +286,7 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
       // Setup perspective projection, with aspect ratio matches viewport
       gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION); // Choose projection matrix
       gl.glLoadIdentity(); // Reset projection matrix
-      glu.gluPerspective(30.0, aspect, 0.1, 100.0); // fovy, aspect, zNear, zFar
+      glu.gluPerspective(30.0, aspect, 0.1, 200.0); // fovy, aspect, zNear, zFar
 //      glu.gluLookAt(0, 0, 6, 0, 0, -10, 0, 1, 0);
 
       // Enable the model-view transform
@@ -254,11 +301,10 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
    public void display(GLAutoDrawable drawable) {
       GL2 gl = drawable.getGL().getGL2(); // Get the OpenGL graphics context
       gl.glClear(GL2.GL_COLOR_BUFFER_BIT | GL2.GL_DEPTH_BUFFER_BIT); // Clear color and depth buffers
-
+      
       // ------ Render a Cube with texture ------
       gl.glLoadIdentity();   // reset model-view matrix
       gl.glTranslatef(0.0f, 0.0f, -5); // translate into the screen
-//      gl.glRotatef(angleX, 1.0f, 0.0f, 0.0f); // rotate about the x-axis
       gl.glRotatef(angleX, 0.0f, 0.0f, 1.0f); // rotate about the x-axis
 
       gl.glRotatef(angleY, 0.0f, 1.0f, 0.0f); // rotate about the y-axis
@@ -288,6 +334,7 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
 
       gl.glBegin(GL2ES3.GL_QUADS); // of the color cube
 
+      gl.glColor3f(0.3f, 0.6f, 1.0f);
       // Front Face
       gl.glNormal3f(0.0f, 0.0f, 1.0f);
       gl.glTexCoord2f(textureLeft, textureBottom);
@@ -375,7 +422,7 @@ private static final int REFRESH_FPS = 60;    // Display refresh frames per seco
     gl.glVertex3f(0.1f, 0.1f, 5.0f); // top-right of the texture and quad
     gl.glTexCoord2f(textureLeft2, textureTop2);
     gl.glVertex3f(-0.1f, 0.1f, 5.0f); // top-left of the texture and quad
-      gl.glEnd();
+    gl.glEnd();
 //      gl.glDisable(GL2.GL_TEXTURE_2D);
 //      gl.glTranslatef(1, 0, 0);
 //      gl.glBegin(GL2.GL_QUADS); // of the color cube

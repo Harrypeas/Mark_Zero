@@ -11,7 +11,6 @@ import java.sql.Statement;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.TransferHandler;
 
